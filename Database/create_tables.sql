@@ -17,7 +17,7 @@ CREATE TABLE user (
 CREATE TABLE company (
     company_id INT AUTO_INCREMENT,
     name VARCHAR(100),
-    reg_date DATE,
+    reg_datetime DATETIME,
     status ENUM ('active', 'inactive'),
     CONSTRAINT PRIMARY KEY (company_id)
 );
@@ -85,14 +85,16 @@ CREATE TABLE salary_audit (
 CREATE TABLE hiring_audit (
     audit_id INT auto_increment,
     staff_id INT,
+    managed_by INT NULL,
     date DATE,
     title varchar(70),
     dept_type INT,
     company_id INT,
-    position ENUM ('manager', 'employee'),
+    position ENUM ('manager', 'employee'), 
     status ENUM ('active', 'inactive'),
     CONSTRAINT hiring_audit_pk PRIMARY KEY (audit_id),
     CONSTRAINT hiring_audit_fk_staff_id FOREIGN KEY (staff_id) REFERENCES user (reg_id) ON DELETE set null,
+    CONSTRAINT hiring_audit_fk_managed_by FOREIGN KEY(managed_by) REFERENCES user(reg_id) ON DELETE set null,
     CONSTRAINT hiring_audit_fk_dept_type FOREIGN KEY (dept_type) REFERENCES department_type (dept_id) ON DELETE SET NULL,
     CONSTRAINT hiring_audit_fk_company_id FOREIGN KEY (company_id) REFERENCES company (company_id) ON DELETE SET NULL
 );

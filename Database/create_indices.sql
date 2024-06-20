@@ -56,6 +56,8 @@ CREATE INDEX idx_company_id_hiring_audit ON hiring_audit (company_id);
 
 CREATE INDEX idx_dept_type_hiring_audit ON hiring_audit (dept_type);
 
+CREATE INDEX idx_managed_by_hiring_audit ON hiring_audit (managed_by);
+
 CREATE INDEX idx_title_hiring_audit ON hiring_audit (title);
 
 CREATE INDEX idx_position_hiring_audit ON hiring_audit (position);
