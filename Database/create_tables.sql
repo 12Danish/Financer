@@ -6,9 +6,10 @@ CREATE TABLE user (
     dob DATE,
     first_name VARCHAR(70),
     last_name VARCHAR(70),
-    status ENUM ('active', 'inactive'),
-    CONSTRAINT PRIMARY KEY (reg_id),
-    CONSTRAINT user_check_len_cnic CHECK (
+    status ENUM ('active', 'inactive') default 'active',
+    CONSTRAINT user_pk PRIMARY KEY (reg_id),
+    CONSTRAINT user_uniq_cnic UNIQUE(cnic),
+    CONSTRAINT user_check_len_and_digits_cnic CHECK (
         CHAR_LENGTH(cnic) = 13
         AND cnic REGEXP '^[0-9]+$'
     )
@@ -18,14 +19,14 @@ CREATE TABLE company (
     company_id INT AUTO_INCREMENT,
     name VARCHAR(100),
     reg_datetime DATETIME,
-    status ENUM ('active', 'inactive'),
-    CONSTRAINT PRIMARY KEY (company_id)
+    status ENUM ('active', 'inactive') default 'active',
+    CONSTRAINT company_pk PRIMARY KEY (company_id)
 );
 
 CREATE TABLE owner (
     owner_id INT,
     company_id INT,
-    CONSTRAINT PRIMARY KEY (owner_id, company_id),
+    CONSTRAINT owner_pk PRIMARY KEY (owner_id, company_id),
     CONSTRAINT owner_fk_owner_id FOREIGN KEY (owner_id) REFERENCES user (reg_id) ON DELETE CASCADE,
     CONSTRAINT owner_fk_company_id FOREIGN KEY (company_id) REFERENCES company (company_id) ON DELETE CASCADE
 );
@@ -33,13 +34,13 @@ CREATE TABLE owner (
 CREATE TABLE department_type (
     dept_id INT auto_increment,
     dept_name VARCHAR(100),
-    CONSTRAINT PRIMARY KEY (dept_id)
+    CONSTRAINT department_type_pk PRIMARY KEY (dept_id)
 );
 
 CREATE TABLE department (
     dept_type INT,
     company_id INT,
-    status ENUM ('active', 'inactive'),
+    status ENUM ('active', 'inactive') default "active",
     CONSTRAINT dept_comp_pk PRIMARY KEY (dept_type, company_id),
     CONSTRAINT department_fk_dept_type FOREIGN KEY (dept_type) REFERENCES department_type (dept_id) ON DELETE CASCADE,
     CONSTRAINT department_fk_company_id FOREIGN KEY (company_id) REFERENCES company (company_id) ON DELETE CASCADE
@@ -101,7 +102,7 @@ CREATE TABLE hiring_audit (
 
 CREATE TABLE account (
     account_number VARCHAR(12),
-    status ENUM ('active', 'inactive'),
+    status ENUM ('active', 'inactive') default 'active',
     balance DECIMAL(10, 2),
     staff_id INT,
     company_id INT,
