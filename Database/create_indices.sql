@@ -4,9 +4,6 @@ USE Financer;
 -- Index on dob for queries filtering by date of birth
 CREATE INDEX idx_dob_user ON user (dob);
 
--- Unique index on cnic to ensure uniqueness and speed up queries filtering by cnic
-CREATE UNIQUE INDEX idx_unique_cnic_user ON user (cnic);
-
 -- Composite index on first_name and last_name for queries filtering by both
 CREATE INDEX idx_name_user ON user (first_name, last_name);
 
@@ -16,7 +13,7 @@ CREATE INDEX idx_status_user ON user (status);
 -- Indexing for company
 CREATE INDEX idx_name_company ON company (name);
 
-CREATE INDEX idx_reg_date_company ON company (reg_date);
+CREATE INDEX idx_reg_datetime_company ON company (reg_datetime);
 
 CREATE INDEX idx_status_company ON company (status);
 

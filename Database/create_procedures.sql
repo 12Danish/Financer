@@ -13,7 +13,7 @@ BEGIN
         -- Set the user status to active
         UPDATE user
         SET user.status = 'active'
-        WHERE user_id = staff_id;
+        WHERE user.reg_id = staff_id;
     END IF;
 END $$
 
