@@ -18,12 +18,12 @@ BEGIN
 END $$
 
 -- This procedure handles insertion into hiring audit for manager 
-CREATE PROCEDURE insert_into_hiring_audit_emp_deletion_or_insertion(IN emp_id INT,IN emp_manager_id INT,IN title VARCHAR(40),IN dept_type INT, IN company_id INT,IN status VARCHAR(15))
-BEGIN 
+CREATE PROCEDURE insert_into_hiring_audit(IN staff_id INT,IN staff_manager_id INT,IN title VARCHAR(40),IN dept_type INT, IN company_id INT,IN status VARCHAR(15), IN 	position VARCHAR(20))
+BEGIN
 DECLARE insert_date DATE;
 SET insert_date = CURDATE();
 INSERT INTO hiring_audit(staff_id,date,title,dept_type,company_id,position,status,managed_by)
-VALUES(emp_id,insert_date,title,dept_type,company_id,"manager",status,emp_manager_id);
+VALUES(staff_id,insert_date,title,dept_type,company_id,position,status,staff_manager_id);
 END$$
 
 -- This procedure checks if employee is a manager as well and handles hiring audit accordingly
@@ -41,12 +41,11 @@ BEGIN
     
     IF is_manager IS NOT NULL THEN
         IF action_type = 'insert' THEN
-            CALL insert_into_hiring_audit_emp_deletion_or_insertion(emp_id, emp_manager_id, title, dept_type, company_id, 'active');
+            CALL insert_into_hiring_audit(emp_id, emp_manager_id, title, dept_type, company_id, 'active', 'manager');
         ELSEIF action_type = 'delete' THEN
-            CALL insert_into_hiring_audit_emp_deletion_or_insertion(emp_id, emp_manager_id, title, dept_type, company_id, 'inactive');
+            CALL insert_into_hiring_audit(emp_id, emp_manager_id, title, dept_type, company_id, 'inactive','manager');
         END IF;
     END IF;
 END $$
-
 
 DELIMITER ;

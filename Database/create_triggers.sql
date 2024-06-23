@@ -6,8 +6,6 @@ CREATE TRIGGER after_employee_insert_manage_hiring_audit
 AFTER INSERT ON employee
 FOR EACH ROW 
 BEGIN 
-    DECLARE insert_date DATE;
-    SET insert_date = CURDATE();
    CALL set_user_status_active_on_staff_insertion(NEW.emp_id);
    CALL check_has_manager_post_emp_deletion_or_insertion(
      NEW.emp_id ,
@@ -17,8 +15,7 @@ BEGIN
      NEW.company_id ,
      "insert"
 );
-INSERT INTO hiring_audit(staff_id, title, dept_type, company_id, position,managed_by,date,status)
-VALUES(NEW.emp_id, NEW.title,NEW.dept_type,NEW.company_id,"employee", NEW.manager_id,insert_date, "active");
+CALL insert_into_hiring_audit(NEW.emp_id, NEW.manager_id, NEW.title, NEW.dept_type, NEW.company_id, 'active', 'employee');
 END;
 
 -- Trigger for addding entry in hiring audit after manager insertion 
@@ -28,18 +25,14 @@ FOR EACH ROW
 BEGIN 
 	 
     -- Declaring local variables 
-    DECLARE insert_date DATE;
     DECLARE managed_by INT;
-CALL set_user_status_active_on_staff_insertion(NEW.manager_id);
-    -- Setting a local variable 
-    SET insert_date = CURDATE();
+	CALL set_user_status_active_on_staff_insertion(NEW.manager_id);
 
     -- Call the FindManagersManager function and store the result in managed_by
     SET managed_by = find_managers_manager(NEW.manager_id);
 
     -- Insert the audit entry using the function result
-    INSERT INTO hiring_audit(staff_id, title, dept_type, company_id, position, managed_by, date, status)
-    VALUES(NEW.manager_id, NEW.title, NEW.dept_type, NEW.company_id, "manager", managed_by, insert_date, "active");
+    CALL insert_into_hiring_audit(NEW.manager_id, managed_by, NEW.title, NEW.dept_type, NEW.company_id, 'active', 'manager');
 END;
 
 -- Trigger for handling removal of Employee in hiring audit
@@ -48,8 +41,6 @@ AFTER DELETE ON employee
 FOR EACH ROW 
 BEGIN
 
-    DECLARE insert_date DATE;
-    SET insert_date = CURDATE();
 	CALL check_has_manager_post_emp_deletion_or_insertion(
      OLD.emp_id ,
      OLD.manager_id ,
@@ -58,8 +49,7 @@ BEGIN
      OLD.company_id ,
      "delete"
 );
-INSERT INTO hiring_audit(staff_id, title, dept_type, company_id, position,managed_by,date,status)
-VALUES(OLD.emp_id, OLD.title,OLD.dept_type,OLD.company_id,"employee", OLD.manager_id,insert_date, "inactive");
+CALL insert_into_hiring_audit(OLD.emp_id, OLD.manager_id, OLD.title, OLD.dept_type, OLD.company_id, 'inactive', 'employee');
 END;
 
 -- Trigger for handling hiring audit after manager removal *
@@ -68,20 +58,14 @@ AFTER DELETE ON manager
 FOR EACH ROW 
 BEGIN 
     -- Declaring local variables 
-    DECLARE insert_date DATE;
     DECLARE managed_by INT;
-
-    -- Setting a local variable 
-    SET insert_date = CURDATE();
 
     -- Call the FindManagersManager function and store the result in managed_by
     SET managed_by = check_has_manager_post_manager_deletion_or_insertion(OLD.manager_id);
 
     -- Insert the audit entry using the function result
-    INSERT INTO hiring_audit(staff_id, title, dept_type, company_id, position, managed_by, date, status)
-    VALUES(OLD.manager_id, OLD.title, OLD.dept_type, OLD.company_id, "manager", managed_by, insert_date, "inactive");
+    CALL insert_into_hiring_audit(OLD.manager_id, managed_by, OLD.title, OLD.dept_type, OLD.company_id, 'inactive', 'manager');
 END;
-
 
 -- Creating a trigger to handle status on user after deletion in employee table *
 CREATE TRIGGER after_employee_removal_handle_user_status
@@ -108,6 +92,35 @@ BEGIN
         SET status = 'inactive'
         WHERE reg_id = OLD.manager_id;
     END IF;
-END
+    
+END;
 
+
+-- This trigger prevents updating manager_id and compnay_id for manager
+CREATE TRIGGER prevent_update_on_manager_id_and_company_id
+BEFORE UPDATE ON manager
+FOR EACH ROW
+BEGIN
+    IF NEW.manager_id != OLD.manager_id THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not allowed to update the manager_id column.';
+    END IF;
+
+    IF NEW.company_id != OLD.company_id THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not allowed to update the manager_id column.';
+    END IF;
+END;
+
+-- This trigger prevents updating emp_id and compnay_id for manager
+CREATE TRIGGER prevent_update_on_emp_id_and_company_id
+BEFORE UPDATE ON employee
+FOR EACH ROW
+BEGIN
+    IF NEW.emp_id != OLD.emp_id THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not allowed to update the emp_id column.';
+    END IF;
+
+    IF NEW.company_id != OLD.company_id THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not allowed to update the manager_id column.';
+    END IF;
+END;
 $$
