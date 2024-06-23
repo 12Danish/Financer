@@ -1,7 +1,6 @@
 USE financer;
 
 DELIMITER $$
-
 -- Trigger for adding entry in hiring_audit after employee insertion
 CREATE TRIGGER after_employee_insert_manage_hiring_audit 
 AFTER INSERT ON employee
@@ -9,6 +8,15 @@ FOR EACH ROW
 BEGIN 
     DECLARE insert_date DATE;
     SET insert_date = CURDATE();
+   CALL set_user_status_active_on_staff_insertion(NEW.emp_id);
+   CALL check_has_manager_post_emp_deletion_or_insertion(
+     NEW.emp_id ,
+     NEW.manager_id ,
+     NEW.title ,
+     NEW.dept_type ,
+     NEW.company_id ,
+     "insert"
+);
 INSERT INTO hiring_audit(staff_id, title, dept_type, company_id, position,managed_by,date,status)
 VALUES(NEW.emp_id, NEW.title,NEW.dept_type,NEW.company_id,"employee", NEW.manager_id,insert_date, "active");
 END;
@@ -18,10 +26,11 @@ CREATE TRIGGER after_manager_insert_manage_hiring_audit
 AFTER INSERT ON manager
 FOR EACH ROW 
 BEGIN 
+	 
     -- Declaring local variables 
     DECLARE insert_date DATE;
     DECLARE managed_by INT;
-
+CALL set_user_status_active_on_staff_insertion(NEW.manager_id);
     -- Setting a local variable 
     SET insert_date = CURDATE();
 
@@ -37,13 +46,21 @@ END;
 CREATE TRIGGER after_employee_removal_manage_hiring_audit
 AFTER DELETE ON employee
 FOR EACH ROW 
-BEGIN 
+BEGIN
+
     DECLARE insert_date DATE;
     SET insert_date = CURDATE();
+	CALL check_has_manager_post_emp_deletion_or_insertion(
+     OLD.emp_id ,
+     OLD.manager_id ,
+     OLD.title ,
+     OLD.dept_type ,
+     OLD.company_id ,
+     "delete"
+);
 INSERT INTO hiring_audit(staff_id, title, dept_type, company_id, position,managed_by,date,status)
 VALUES(OLD.emp_id, OLD.title,OLD.dept_type,OLD.company_id,"employee", OLD.manager_id,insert_date, "inactive");
 END;
-
 
 -- Trigger for handling hiring audit after manager removal *
 CREATE TRIGGER after_manager_removal_manage_hiring_audit
