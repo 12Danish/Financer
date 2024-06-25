@@ -1,6 +1,7 @@
 USE financer;
 
 DELIMITER $$
+
 -- Trigger for adding entry in hiring_audit after employee insertion
 CREATE TRIGGER after_employee_insert_manage_hiring_audit 
 AFTER INSERT ON employee
@@ -75,9 +76,7 @@ BEGIN
     DECLARE manager_position INT;
     SET manager_position = find_possible_position_after_employee_deletion(OLD.emp_id);
     IF manager_position = 0 THEN
-        UPDATE user 
-        SET status = 'inactive'
-        WHERE reg_id = OLD.emp_id;
+     CALL set_user_status_inactive_on_staff_deletion(OLD.emp_id);
     END IF;
 END;
 -- Creating a trigger to handle status on user after deletion in manager table
@@ -88,13 +87,10 @@ BEGIN
     DECLARE emp_position INT;
     SET emp_position = find_possible_position_after_employee_deletion(OLD.manager_id);
     IF emp_position = 0 THEN
-        UPDATE user 
-        SET status = 'inactive'
-        WHERE reg_id = OLD.manager_id;
+         CALL set_user_status_inactive_on_staff_deletion(OLD.manager_id);
     END IF;
     
 END;
-
 
 -- This trigger prevents updating manager_id and compnay_id for manager
 CREATE TRIGGER prevent_update_on_manager_id_and_company_id
@@ -123,4 +119,33 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'You are not allowed to update the manager_id column.';
     END IF;
 END;
+
+-- Hndling user status after owner insertion 
+CREATE TRIGGER after_owner_insert_handle_user_status
+AFTER INSERT ON owner
+FOR EACH ROW
+BEGIN 
+    DECLARE is_active_owner INT;
+    SET is_active_owner = check_is_owner(NEW.owner_id);
+    IF is_active_owner = 0 THEN
+        CALL set_user_status_active_on_staff_insertion(NEW.owner_id);
+    END IF;
+END;
+
+-- Handling user status after owner deletion
+CREATE TRIGGER after_owner_delete_handle_user_status
+AFTER DELETE ON owner
+FOR EACH ROW
+BEGIN 
+DECLARE is_active_owner INT;
+SET is_active_owner =  check_is_owner(OLD.owner_id);
+IF(is_active_owner = 0)
+THEN
+ CALL set_user_status_inactive_on_staff_deletion(OLD.owner_id);
+END if;
+end
+
+
+
+
 $$

@@ -6,7 +6,7 @@ CREATE TABLE user (
     dob DATE,
     first_name VARCHAR(70),
     last_name VARCHAR(70),
-    status ENUM ('active', 'inactive') default 'active',
+    status ENUM ('active', 'inactive') default 'inactive',
     CONSTRAINT user_pk PRIMARY KEY (reg_id),
     CONSTRAINT user_uniq_cnic UNIQUE(cnic),
     CONSTRAINT user_check_len_and_digits_cnic CHECK (

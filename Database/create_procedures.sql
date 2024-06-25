@@ -1,4 +1,6 @@
+USE FINANCER;
 DELIMITER $$
+
 -- This procedure sets the user to active on staff insertion
 CREATE PROCEDURE set_user_status_active_on_staff_insertion(IN staff_id INT)
 BEGIN
@@ -47,5 +49,14 @@ BEGIN
         END IF;
     END IF;
 END $$
+
+CREATE PROCEDURE set_user_status_inactive_on_staff_deletion(IN staff_id INT)
+BEGIN
+	-- Set the user status to inactive
+        UPDATE user
+        SET user.status = 'inactive'
+        WHERE user.reg_id = staff_id;
+END $$
+
 
 DELIMITER ;
