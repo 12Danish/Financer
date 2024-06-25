@@ -18,7 +18,7 @@ CREATE TABLE user (
 CREATE TABLE company (
     company_id INT AUTO_INCREMENT,
     name VARCHAR(100),
-    reg_datetime DATETIME,
+    reg_datetime DATETIME DEFAULT CURRENT_TIMESTAMP,
     status ENUM ('active', 'inactive') default 'active',
     CONSTRAINT company_pk PRIMARY KEY (company_id)
 );
