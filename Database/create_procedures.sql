@@ -41,7 +41,7 @@ BEGIN
     DECLARE is_manager INT;
     SET is_manager = check_is_manager(emp_id);
     
-    IF is_manager IS NOT NULL THEN
+    IF is_manager = 1 THEN
         IF action_type = 'insert' THEN
             CALL insert_into_hiring_audit(emp_id, emp_manager_id, title, dept_type, company_id, 'active', 'manager');
         ELSEIF action_type = 'delete' THEN
@@ -50,6 +50,7 @@ BEGIN
     END IF;
 END $$
 
+
 CREATE PROCEDURE set_user_status_inactive_on_staff_deletion(IN staff_id INT)
 BEGIN
 	-- Set the user status to inactive
@@ -57,6 +58,5 @@ BEGIN
         SET user.status = 'inactive'
         WHERE user.reg_id = staff_id;
 END $$
-
 
 DELIMITER ;

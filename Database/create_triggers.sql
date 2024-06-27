@@ -30,7 +30,7 @@ BEGIN
 	CALL set_user_status_active_on_staff_insertion(NEW.manager_id);
 
     -- Call the FindManagersManager function and store the result in managed_by
-    SET managed_by = find_managers_manager(NEW.manager_id);
+    SET managed_by =check_has_manager_post_manager_deletion_or_insertion(NEW.manager_id)
 
     -- Insert the audit entry using the function result
     CALL insert_into_hiring_audit(NEW.manager_id, managed_by, NEW.title, NEW.dept_type, NEW.company_id, 'active', 'manager');
@@ -85,7 +85,7 @@ AFTER DELETE ON manager
 FOR EACH ROW 
 BEGIN 
     DECLARE emp_position INT;
-    SET emp_position = find_possible_position_after_employee_deletion(OLD.manager_id);
+    SET emp_position = find_possible_position_after_manager_deletion(OLD.manager_id);
     IF emp_position = 0 THEN
          CALL set_user_status_inactive_on_staff_deletion(OLD.manager_id);
     END IF;
@@ -132,6 +132,14 @@ BEGIN
     END IF;
 END;
 
+-- Hndling user status after owner insertion 
+CREATE TRIGGER after_owner_insert_handle_user_status
+AFTER INSERT ON owner
+FOR EACH ROW
+BEGIN 
+            CALL set_user_status_active_on_staff_insertion(NEW.owner_id);
+END;
+
 -- Handling user status after owner deletion
 CREATE TRIGGER after_owner_delete_handle_user_status
 AFTER DELETE ON owner
@@ -143,9 +151,8 @@ IF(is_active_owner = 0)
 THEN
  CALL set_user_status_inactive_on_staff_deletion(OLD.owner_id);
 END if;
-end
-
-
+end;
+    
 
 
 $$

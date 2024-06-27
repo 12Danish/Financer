@@ -2,7 +2,22 @@ USE financer;
 
 DELIMITER $$
 
--- Checking if a manager is an employee as well
+CREATE FUNCTION check_is_manager(input_id INT)
+RETURNS INT 
+DETERMINISTIC 
+READS SQL DATA
+BEGIN
+    DECLARE possible_manager_result INT;
+    
+    SELECT EXISTS (
+        SELECT 1
+        FROM manager
+        WHERE manager.manager_id = input_id
+    ) INTO possible_manager_result;
+    
+    RETURN possible_manager_result;
+END $$
+-- Checking if a manager is an employee as well  
 CREATE FUNCTION find_possible_position_after_manager_deletion(manager_id_value INT)
 RETURNS INT
 DETERMINISTIC
@@ -57,23 +72,25 @@ BEGIN
 END $$
 
 -- checking if owner exists
-CREATE FUNCTION check_is_owner(user_id INT)
+CREATE FUNCTION check_is_owner(input_id INT)
 RETURNS INT 
 DETERMINISTIC 
 READS SQL DATA
 BEGIN
-   DECLARE possible_owner_result INT;
+    DECLARE possible_owner_result INT;
+    
     SELECT CASE
         WHEN EXISTS (
             SELECT 1 
             FROM owner
-            WHERE owner_id = user_id
+            WHERE owner_id = input_id
         ) THEN 1
         ELSE 0
     END INTO possible_owner_result;
-
+    
     RETURN possible_owner_result;
 END $$
 
 DELIMITER ;
+
 
