@@ -91,6 +91,7 @@ BEGIN
     RETURN possible_owner_result;
 END $$
 
+
 DELIMITER ;
 
 

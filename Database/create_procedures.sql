@@ -59,4 +59,42 @@ BEGIN
         WHERE user.reg_id = staff_id;
 END $$
 
+
+-- This procdure handles insertion of all the employees related to the manager being removed and inserts them into hiring audit
+CREATE PROCEDURE employees_of_manager_into_hiring_audit_after_manager_removal(IN input_manager_id INT)
+BEGIN
+    DECLARE done INT DEFAULT 0;
+    DECLARE emp_id INT;
+    DECLARE emp_manager_id INT;
+    DECLARE emp_title VARCHAR(255);
+    DECLARE emp_dept_type VARCHAR(255);
+    DECLARE emp_company_id INT;
+    
+    DECLARE emp_cursor CURSOR FOR 
+        SELECT emp_id, manager_id, title, dept_type, company_id 
+        FROM employee 
+        WHERE manager_id = input_manager_id;
+    
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+    -- Open cursor
+    OPEN emp_cursor;
+
+    -- Fetch data from cursor
+    fetch_loop: LOOP
+        FETCH emp_cursor INTO emp_id, emp_manager_id, emp_title, emp_dept_type, emp_company_id;
+        IF done THEN
+            LEAVE fetch_loop;
+        END IF;
+        
+        -- Call the procedure for each employee
+        CALL insert_into_hiring_audit(emp_id, emp_manager_id, emp_title, emp_dept_type, emp_company_id, 'active', 'employee');
+    END LOOP;
+
+    -- Close cursor
+    CLOSE emp_cursor;
+END $$
+
+
+
 DELIMITER ;
