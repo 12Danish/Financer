@@ -1,4 +1,5 @@
-USE FINANCER;
+-- Procedures
+USE Financer;
 DELIMITER $$
 
 -- This procedure sets the user to active on staff insertion

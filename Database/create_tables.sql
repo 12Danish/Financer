@@ -1,3 +1,4 @@
+-- Create table commands
 USE Financer;
 
 CREATE TABLE user (

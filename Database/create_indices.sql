@@ -1,3 +1,4 @@
+-- Indexes
 USE Financer;
 
 -- Indexing for user table
