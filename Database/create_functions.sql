@@ -1,4 +1,5 @@
-USE financer;
+-- Functions 
+USE Financer;
 
 DELIMITER $$
 
