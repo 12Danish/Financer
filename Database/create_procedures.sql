@@ -33,7 +33,7 @@ END$$
 CREATE PROCEDURE check_has_manager_post_emp_deletion_or_insertion(
     IN emp_id INT,
     IN emp_manager_id INT,
-    IN title VARCHAR(40),
+    IN title VARCHAR(70),
     IN dept_type INT,
     IN company_id INT,
     IN action_type VARCHAR(10)
@@ -60,42 +60,41 @@ BEGIN
         WHERE user.reg_id = staff_id;
 END $$
 
-
--- This procdure handles insertion of all the employees related to the manager being removed and inserts them into hiring audit
+-- entering employees of manager into hiring audit on manager delete 
 CREATE PROCEDURE employees_of_manager_into_hiring_audit_after_manager_removal(IN input_manager_id INT)
 BEGIN
     DECLARE done INT DEFAULT 0;
-    DECLARE emp_id INT;
-    DECLARE emp_manager_id INT;
-    DECLARE emp_title VARCHAR(255);
-    DECLARE emp_dept_type VARCHAR(255);
-    DECLARE emp_company_id INT;
+    DECLARE managed_emp_id INT;
+    DECLARE managed_emp_manager_id INT;
+    DECLARE managed_emp_title VARCHAR(70);
+    DECLARE managed_emp_dept_type INT;
+    DECLARE managed_emp_company_id INT;
     
-    DECLARE emp_cursor CURSOR FOR 
+    DECLARE managed_emp_cursor CURSOR FOR 
         SELECT emp_id, manager_id, title, dept_type, company_id 
         FROM employee 
-        WHERE manager_id = input_manager_id;
+        WHERE employee.manager_id = input_manager_id;
     
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
-
+	
     -- Open cursor
-    OPEN emp_cursor;
-
+    OPEN managed_emp_cursor;
+	
     -- Fetch data from cursor
     fetch_loop: LOOP
-        FETCH emp_cursor INTO emp_id, emp_manager_id, emp_title, emp_dept_type, emp_company_id;
+        FETCH managed_emp_cursor INTO managed_emp_id, managed_emp_manager_id, managed_emp_title, managed_emp_dept_type, managed_emp_company_id;
         IF done THEN
             LEAVE fetch_loop;
         END IF;
-        
+         
         -- Call the procedure for each employee
-        CALL insert_into_hiring_audit(emp_id, emp_manager_id, emp_title, emp_dept_type, emp_company_id, 'active', 'employee');
+        CALL insert_into_hiring_audit(managed_emp_id, managed_emp_manager_id, managed_emp_title, managed_emp_dept_type, managed_emp_company_id, 'inactive', 'employee');
     END LOOP;
 
     -- Close cursor
-    CLOSE emp_cursor;
+    CLOSE managed_emp_cursor;
+    
 END $$
-
 
 
 DELIMITER ;

@@ -52,6 +52,15 @@ BEGIN
     CALL insert_into_hiring_audit(OLD.emp_id, OLD.manager_id, OLD.title, OLD.dept_type, OLD.company_id, 'inactive', 'employee');
 END$$
 
+-- Trigger for handling insertion of manager's employees into hiring audit
+CREATE TRIGGER before_manager_delete_insert_managed_employees_in_hiring_audit
+BEFORE DELETE ON manager
+FOR EACH ROW 
+BEGIN 
+ -- Inserting all the manager's employees who have manager_id as null now 
+    CALL employees_of_manager_into_hiring_audit_after_manager_removal(OLD.manager_id);
+END$$
+
 -- Trigger for handling hiring audit after manager removal
 CREATE TRIGGER after_manager_removal_manage_hiring_audit
 AFTER DELETE ON manager
@@ -60,13 +69,11 @@ BEGIN
     -- Declaring local variables 
     DECLARE managed_by INT;
 
-    -- Call the FindManagersManager function and store the result in managed_by
+    -- Call the function and store the result in managed_by
     SET managed_by = check_has_manager_post_manager_deletion_or_insertion(OLD.manager_id);
 
     -- Insert the audit entry using the function result
     CALL insert_into_hiring_audit(OLD.manager_id, managed_by, OLD.title, OLD.dept_type, OLD.company_id, 'inactive', 'manager');
-    -- Inserting all the manager's employees who have manager_id as null now 
-    CALL employees_of_manager_into_hiring_audit_after_manager_removal(OLD.manager_id);
 END$$
 
 -- Creating a trigger to handle status on user after deletion in employee table
@@ -173,5 +180,6 @@ BEGIN
         CALL insert_into_hiring_audit(OLD.emp_id, NEW.manager_id, NEW.title, NEW.dept_type, OLD.company_id, 'active', 'employee');
     END IF;
 END$$
+
 
 DELIMITER ;
