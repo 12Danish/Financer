@@ -181,5 +181,17 @@ BEGIN
     END IF;
 END$$
 
+-- This trigger handles changes in manager related to hiring audit 
+CREATE TRIGGER update_manager_handle_hiring_audit
+AFTER UPDATE ON manager 
+FOR EACH ROW 
+BEGIN 
+	DECLARE managed_by INT;
+    SET managed_by = check_has_manager_post_manager_deletion_or_insertion(OLD.manager_id);
+IF NEW.title != OLD.title OR NEW.dept_type != OLD.dept_type THEN
+        CALL insert_into_hiring_audit(OLD.manager_id,managed_by, OLD.title, OLD.dept_type, OLD.company_id, 'inactive', 'manager');
+        CALL insert_into_hiring_audit(NEW.manager_id,managed_by, NEW.title, NEW.dept_type, OLD.company_id, 'active', 'manager');
+    END IF;
+END$$
 
 DELIMITER ;
