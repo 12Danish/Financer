@@ -96,5 +96,19 @@ BEGIN
     
 END $$
 
+CREATE PROCEDURE insert_into_salary_audit (
+    IN staff_id INT,
+    IN salary DECIMAL(10,2),
+    IN company_id INT, 
+    IN dept_type INT
+)
+BEGIN 
+    DECLARE insert_date DATE;
+    SET insert_date = CURDATE();
+
+    INSERT INTO salary_audit (staff_id, salary, company_id, dept_type,date)
+    VALUES (staff_id, salary, company_id, dept_type, insert_date);
+END $$
+
 
 DELIMITER ;

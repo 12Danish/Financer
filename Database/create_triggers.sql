@@ -194,4 +194,62 @@ IF NEW.title != OLD.title OR NEW.dept_type != OLD.dept_type THEN
     END IF;
 END$$
 
+-- handling salary audit for employee on insertion
+CREATE TRIGGER after_employee_insert_handle_salary_audit
+AFTER INSERT ON employee
+FOR EACH ROW 
+BEGIN 
+CALL insert_into_salary_audit (
+    NEW.emp_id,
+    NEW.salary,
+	NEW.company_id,
+    NEW.dept_type
+);
+END$$
+
+-- handling salary audit for manager on insertion
+CREATE TRIGGER after_manager_insert_handle_salary_audit
+AFTER INSERT ON manager
+FOR EACH ROW 
+BEGIN 
+CALL insert_into_salary_audit (
+    NEW.manager_id,
+    NEW.salary,
+	NEW.company_id,
+    NEW.dept_type
+);
+END$$
+
+-- Handling salary update for employee
+CREATE TRIGGER after_employee_salary_update_handle_salary_audit
+AFTER UPDATE ON employee
+FOR EACH ROW 
+BEGIN
+IF NEW.salary != OLD.salary 
+THEN 
+CALL insert_into_salary_audit (
+    OLD.emp_id,
+    NEW.salary,
+	OLD.company_id,
+    NEW.dept_type
+); 
+END IF;
+END$$
+
+-- Handling salary update for manager
+CREATE TRIGGER after_manager_salary_update_handle_salary_audit
+AFTER UPDATE ON manager
+FOR EACH ROW 
+BEGIN
+IF NEW.salary != OLD.salary 
+THEN 
+CALL insert_into_salary_audit (
+    OLD.manager_id,
+    NEW.salary,
+	OLD.company_id,
+    NEW.dept_type
+); 
+END IF;
+END$$
+
 DELIMITER ;

@@ -42,12 +42,12 @@ CREATE INDEX idx_manager_id_employee ON employee (manager_id);
 
 -- Indexing on salary_audit
 CREATE INDEX idx_staff_id_salary_audit ON salary_audit (staff_id);
-
+CREATE INDEX idx_dept_type_salary_audit ON salary_audit(dept_type);
+CREATE INDEX idx_company_id_salary_audit ON salary_audit(company_id);
 CREATE INDEX idx_date_salary_audit ON salary_audit (date);
 
 -- Indexing for hiring_audit
 CREATE INDEX idx_staff_id_hiring_audit ON hiring_audit (staff_id);
-
 CREATE INDEX idx_date_hiring_audit ON hiring_audit (date);
 
 CREATE INDEX idx_company_id_hiring_audit ON hiring_audit (company_id);
