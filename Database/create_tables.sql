@@ -78,10 +78,14 @@ CREATE TABLE salary_audit (
     audit_id INT auto_increment,
     staff_id INT,
     salary DECIMAL(10, 2),
+    company_id INT,
+    dept_type INT,
     date DATE,
     CONSTRAINT salary_audit_pk PRIMARY KEY (audit_id),
     CONSTRAINT salary_audit_check_salary_gt_0 CHECK (salary >= 0),
-    CONSTRAINT salary_audit_fk_staff_id FOREIGN KEY (staff_id) REFERENCES user (reg_id) ON DELETE set null
+    CONSTRAINT salary_audit_fk_staff_id FOREIGN KEY (staff_id) REFERENCES user (reg_id) ON DELETE set null,
+    CONSTRAINT salary_fk_dept_type FOREIGN KEY (dept_type) REFERENCES department_type (dept_id) ON DELETE SET NULL,
+	CONSTRAINT salary_fk_company_id FOREIGN KEY (company_id) REFERENCES company (company_id) ON DELETE SET NULL
 );
 
 CREATE TABLE hiring_audit (
