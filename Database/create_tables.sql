@@ -194,3 +194,25 @@ CREATE TABLE credit_transaction_audit (
     CONSTRAINT credit_transaction_audit_transaction_number FOREIGN KEY (transaction_number) REFERENCES transaction (transaction_number) ON DELETE CASCADE,
     CONSTRAINT credit_transaction_audit_budget_check_gt_0 CHECK (budget >= 0)
 );
+
+CREATE TABLE owner_audit(
+owner_id INT,
+company_id INT,
+status ENUM('active', 'inactive'),
+date DATE,
+CONSTRAINT owner_audit_fk_owner_id FOREIGN KEY (owner_id) REFERENCES user (reg_id) ON DELETE cascade
+);
+
+CREATE TABLE company_audit(
+company_id INT,
+name VARCHAR(100),
+date date,
+status ENUM('active', 'inactive')
+);
+
+CREATE TABLE department_audit(
+dept_type INT,
+company_id INT,
+status ENUM('active', 'inactive'),
+date date
+)
