@@ -111,4 +111,19 @@ BEGIN
 END $$
 
 
+CREATE PROCEDURE insert_into_company_audit(
+IN company_id INT,
+IN name VARCHAR(100),
+IN status enum('active', 'inactive')
+)
+
+BEGIN 
+DECLARE insert_date DATE;
+SET insert_date = CURDATE();
+
+INSERT INTO company_audit(company_id,name,date,status)
+VALUES(company_id,name,insert_date,status);
+
+END$$
+
 DELIMITER ;
