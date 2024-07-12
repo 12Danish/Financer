@@ -14,15 +14,9 @@ CREATE INDEX idx_status_user ON user (status);
 -- Indexing for company
 CREATE INDEX idx_name_company ON company (name);
 
-CREATE INDEX idx_reg_datetime_company ON company (reg_datetime);
-
-CREATE INDEX idx_status_company ON company (status);
-
 -- Indexing for dept_type
 CREATE UNIQUE INDEX idx_name_dept_type ON department_type (dept_name);
 
--- Indexing on department
-CREATE INDEX idx_status_department ON department (status);
 
 -- Indexing on MANAGER 
 CREATE INDEX idx_company_id_manager ON manager (company_id);

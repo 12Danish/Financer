@@ -19,8 +19,6 @@ CREATE TABLE user (
 CREATE TABLE company (
     company_id INT AUTO_INCREMENT,
     name VARCHAR(100),
-    reg_datetime DATETIME DEFAULT CURRENT_TIMESTAMP,
-    status ENUM ('active', 'inactive') default 'active',
     CONSTRAINT company_pk PRIMARY KEY (company_id)
 );
 
@@ -41,7 +39,6 @@ CREATE TABLE department_type (
 CREATE TABLE department (
     dept_type INT,
     company_id INT,
-    status ENUM ('active', 'inactive') default "active",
     CONSTRAINT dept_comp_pk PRIMARY KEY (dept_type, company_id),
     CONSTRAINT department_fk_dept_type FOREIGN KEY (dept_type) REFERENCES department_type (dept_id) ON DELETE CASCADE,
     CONSTRAINT department_fk_company_id FOREIGN KEY (company_id) REFERENCES company (company_id) ON DELETE CASCADE
