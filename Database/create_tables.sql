@@ -194,23 +194,29 @@ CREATE TABLE credit_transaction_audit (
 );
 
 CREATE TABLE owner_audit(
+audit_id INT,
 owner_id INT,
 company_id INT,
 status ENUM('active', 'inactive'),
 date DATE,
+constraint owner_audit_pk primary key(audit_id),
 CONSTRAINT owner_audit_fk_owner_id FOREIGN KEY (owner_id) REFERENCES user (reg_id) ON DELETE cascade
 );
 
 CREATE TABLE company_audit(
+audit_id INT,
 company_id INT,
 name VARCHAR(100),
 date date,
+constraint company_audit_pk primary key(audit_id),
 status ENUM('active', 'inactive')
 );
 
 CREATE TABLE department_audit(
+audit_id INT,
 dept_type INT,
 company_id INT,
+constraint department_audit_pk primary key(audit_id),
 status ENUM('active', 'inactive'),
 date date
-)
+);

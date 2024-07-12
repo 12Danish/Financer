@@ -252,4 +252,29 @@ CALL insert_into_salary_audit (
 END IF;
 END$$
 
+-- Inserting into compnay_audit whenever new company is added 
+CREATE TRIGGER after_company_insertion_handle_company_audit
+AFTER INSERT ON company 
+FOR EACH ROW
+BEGIN 
+CALL insert_into_company_audit(NEW.company_id,NEW.name, 'active');
+END $$
+
+-- Inserting into company_audit whenever comapny is deleted 
+CREATE TRIGGER after_company_delete_handle_company_audit
+AFTER DELETE ON company 
+FOR EACH ROW
+BEGIN 
+CALL insert_into_company_audit(OLD.company_id,OLD.name, 'inactive');
+END $$
+
+-- Inserting into company audit whenever name is changed
+CREATE TRIGGER after_company_name_change_handle_company_audit
+AFTER UPDATE ON company 
+FOR EACH ROW 
+BEGIN 
+CAll insert_into_company_audit(OLD.company_id,OLD.name, 'inactive');
+CALL insert_into_company_audit(OLD.company_id,NEW.name, 'active');
+END $$
+
 DELIMITER ;

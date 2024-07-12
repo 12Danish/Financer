@@ -106,3 +106,22 @@ CREATE INDEX idx_credit_transaction_audit_company_id ON credit_transaction_audit
 CREATE INDEX idx_credit_transaction_audit_dept_type ON credit_transaction_audit (dept_type);
 
 CREATE INDEX idx_credit_transaction_audit_datetime ON credit_transaction_audit (datetime);
+
+
+-- indexing for owner_audit
+CREATE INDEX idx_owner_audit_status ON owner_audit(status);
+CREATE INDEX idx_owner_audit_date ON owner_audit(date);
+CREATE INDEX idx_owner_audit_owner_id ON owner_audit(owner_id);
+CREATE INDEX idx_owner_audit_company_id ON owner_audit(company_id);
+
+-- indexing for company_audit 
+CREATE INDEX idx_company_audit_status ON company_audit(status);
+CREATE INDEX idx_company_audit_date ON company_audit(date);
+CREATE INDEX idx_company_audit_name ON company_audit(name);
+CREATE INDEX idx_company_audit_company_id ON company_audit(company_id);
+
+-- indexing for department_audit 
+CREATE INDEX idx_department_audit_status ON department_audit(status);
+CREATE INDEX idx_department_audit_date ON department_audit(date);
+CREATE INDEX idx_department_audit_dept_type ON department_audit(dept_type);
+CREATE INDEX idx_department_audit_company_id ON department_audit(company_id);
