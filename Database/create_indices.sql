@@ -68,6 +68,8 @@ CREATE INDEX idx_account_number_account_audit ON account_audit (account_number);
 
 CREATE INDEX idx_date_account_audit ON account_audit (datetime);
 
+CREATE INDEX idx_status_account_audit ON account_audit (status);
+
 -- Indexing for transaction
 CREATE INDEX idx_transaction_sender ON transaction (sender);
 

@@ -124,6 +124,7 @@ CREATE TABLE account_audit (
     audit_id INT AUTO_INCREMENT,
     account_number VARCHAR(12),
     balance DECIMAL(10, 2),
+    status ENUM('active', 'inactive'),
     datetime DATETIME DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_account_audit PRIMARY KEY (audit_id),
     CONSTRAINT account_audit_check_amount_gt_0 CHECK (balance >= 0),
