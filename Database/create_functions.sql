@@ -72,6 +72,7 @@ BEGIN
     RETURN managed_by; -- Return the managed_by value
 END $$
 
+
 -- checking if owner exists
 CREATE FUNCTION check_is_owner(input_id INT)
 RETURNS INT 
@@ -80,18 +81,14 @@ READS SQL DATA
 BEGIN
     DECLARE possible_owner_result INT;
     
-    SELECT CASE
-        WHEN EXISTS (
-            SELECT 1 
-            FROM owner
-            WHERE owner_id = input_id
-        ) THEN 1
-        ELSE 0
-    END INTO possible_owner_result;
+    SELECT EXISTS (
+        SELECT 1
+        FROM owner
+        WHERE owner.owner_id = input_id
+    ) INTO possible_owner_result;
     
     RETURN possible_owner_result;
 END $$
-
 
 DELIMITER ;
 
