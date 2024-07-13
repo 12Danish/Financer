@@ -277,4 +277,34 @@ CAll insert_into_company_audit(OLD.company_id,OLD.name, 'inactive');
 CALL insert_into_company_audit(OLD.company_id,NEW.name, 'active');
 END $$
 
+
+
+# Preventing insertion in employee if user is owner
+CREATE TRIGGER before_emp_insert_verify_owner_status
+BEFORE INSERT ON employee
+FOR EACH ROW
+BEGIN
+    DECLARE is_owner INT;
+
+    SET is_owner = check_is_owner(NEW.emp_id);
+
+    IF is_owner = 1 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'This person owns their own company, you can not keep them as your employee';
+    END IF;
+END$$
+
+
+# Preventing insertion in employee if user is owner
+CREATE TRIGGER before_manager_insert_verify_owner_status
+BEFORE INSERT ON manager
+FOR EACH ROW
+BEGIN
+DECLARE is_owner INT; 
+
+SET is_owner = check_is_owner(NEW.manager_id);
+
+IF is_owner = 1 THEN 
+SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'This person owns their own company, you can not keep them as your manager';
+END IF;
+END$$
 DELIMITER ;
