@@ -279,7 +279,7 @@ END $$
 
 
 
-# Preventing insertion in employee if user is owner
+-- Preventing insertion in employee if user is owner
 CREATE TRIGGER before_emp_insert_verify_owner_status
 BEFORE INSERT ON employee
 FOR EACH ROW
@@ -294,7 +294,7 @@ BEGIN
 END$$
 
 
-# Preventing insertion in employee if user is owner
+-- Preventing insertion in employee if user is owner
 CREATE TRIGGER before_manager_insert_verify_owner_status
 BEFORE INSERT ON manager
 FOR EACH ROW
@@ -307,4 +307,38 @@ IF is_owner = 1 THEN
 SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'This person owns their own company, you can not keep them as your manager';
 END IF;
 END$$
+
+
+CREATE TRIGGER after_owner_insert_handle_owner_audit
+AFTER INSERT ON owner 
+FOR EACH ROW
+BEGIN 
+CALL insert_into_owner_audit(NEW.owner_id,NEW.company_id, 'active');
+END$$
+
+
+CREATE TRIGGER after_owner_delete_handle_owner_audit
+AFTER DELETE ON owner 
+FOR EACH ROW
+BEGIN 
+CALL insert_into_owner_audit(OLD.owner_id,OLD.company_id, 'inactive');
+END$$
+
+
+CREATE TRIGGER after_department_insert_handle_owner_audit
+AFTER INSERT ON department 
+FOR EACH ROW
+BEGIN 
+CALL insert_into_department_audit(NEW.dept_type,NEW.company_id, 'active');
+END$$
+
+
+CREATE TRIGGER after_department_delete_handle_owner_audit
+AFTER DELETE ON department 
+FOR EACH ROW
+BEGIN 
+CALL insert_into_department_audit(OLD.dept_type,OLD.company_id, 'inactive');
+END$$
+DELIMITER ;
+
 DELIMITER ;

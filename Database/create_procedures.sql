@@ -126,4 +126,33 @@ VALUES(company_id,name,insert_date,status);
 
 END$$
 
+CREATE PROCEDURE insert_into_owner_audit(
+IN owner_id INT,
+IN company_id INT,
+IN status enum('active', 'inactive')
+)
+
+BEGIN 
+DECLARE insert_date DATE;
+SET insert_date = CURDATE();
+
+INSERT INTO owner_audit(owner_id,company_id,date,status)
+VALUES(owner_id,company_id,insert_date,status);
+
+END$$
+
+CREATE PROCEDURE insert_into_department_audit(
+IN dept_type INT,
+IN company_id INT,
+IN status enum('active', 'inactive')
+)
+BEGIN 
+DECLARE insert_date DATE;
+SET insert_date = CURDATE();
+
+INSERT INTO department_audit(dept_type,company_id,date,status)
+VALUES(dept_type,company_id,insert_date,status);
+
+END$$
+
 DELIMITER ;

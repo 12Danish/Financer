@@ -193,8 +193,9 @@ CREATE TABLE credit_transaction_audit (
     CONSTRAINT credit_transaction_audit_budget_check_gt_0 CHECK (budget >= 0)
 );
 
+
 CREATE TABLE owner_audit(
-audit_id INT,
+audit_id INT auto_increment,
 owner_id INT,
 company_id INT,
 status ENUM('active', 'inactive'),
@@ -204,7 +205,7 @@ CONSTRAINT owner_audit_fk_owner_id FOREIGN KEY (owner_id) REFERENCES user (reg_i
 );
 
 CREATE TABLE company_audit(
-audit_id INT,
+audit_id INT auto_increment,
 company_id INT,
 name VARCHAR(100),
 date date,
@@ -213,7 +214,7 @@ status ENUM('active', 'inactive')
 );
 
 CREATE TABLE department_audit(
-audit_id INT,
+audit_id INT auto_increment,
 dept_type INT,
 company_id INT,
 constraint department_audit_pk primary key(audit_id),
