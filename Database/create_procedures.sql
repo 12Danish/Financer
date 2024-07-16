@@ -155,4 +155,36 @@ VALUES(dept_type,company_id,insert_date,status);
 
 END$$
 
+
+-- This procedure takes in the the company_id and then deletes all managers and employees related to the company and adds them to hiring_audit
+CREATE PROCEDURE employees_of_company_into_hiring_audit_after_manager_removal(IN input_company_id INT)
+BEGIN
+    DECLARE done INT DEFAULT 0;
+    DECLARE company_emp_id INT;
+    DECLARE company_emp_manager_id INT;
+    DECLARE company_emp_title VARCHAR(70);
+    DECLARE company_emp_dept_type INT;
+    DECLARE company_emp_company_id INT;
+    
+    DECLARE company_emp_cursor CURSOR FOR 
+        SELECT emp_id, manager_id, title, dept_type, company_id 
+        FROM employee 
+        WHERE employee.comopany_id = input_company_id;
+    
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+	
+    -- Open cursor
+    OPEN company_emp_cursor;
+	
+    -- Fetch data from cursor
+    fetch_loop: LOOP
+        FETCH company_emp_cursor INTO company_emp_id, company_emp_manager_id, company_emp_title, company_emp_dept_type, company_emp_company_id;
+        IF done THEN
+            LEAVE fetch_loop;
+        END IF;
+         
+        -- Call the procedure for each employee
+        CALL insert_into_hiring_audit(company_emp_id, company_emp_manager_id, company_emp_title, company_emp_dept_type, company_emp_company_id, 'inactive', 'employee');
+    END LOOP;
+END$$
 DELIMITER ;

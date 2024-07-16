@@ -325,7 +325,7 @@ CALL insert_into_owner_audit(OLD.owner_id,OLD.company_id, 'inactive');
 END$$
 
 
-CREATE TRIGGER after_department_insert_handle_owner_audit
+CREATE TRIGGER after_department_insert_handle_department_audit
 AFTER INSERT ON department 
 FOR EACH ROW
 BEGIN 
@@ -333,7 +333,7 @@ CALL insert_into_department_audit(NEW.dept_type,NEW.company_id, 'active');
 END$$
 
 
-CREATE TRIGGER after_department_delete_handle_owner_audit
+CREATE TRIGGER after_department_delete_handle_department_audit
 AFTER DELETE ON department 
 FOR EACH ROW
 BEGIN 

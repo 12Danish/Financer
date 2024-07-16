@@ -54,7 +54,7 @@ CREATE TABLE manager (
     CONSTRAINT manager_salary_gt_0 CHECK (salary > 0),
     CONSTRAINT manager_fk_manager_id FOREIGN KEY (manager_id) REFERENCES user (reg_id) ON DELETE cascade,
     CONSTRAINT manager_fk_dept_type FOREIGN KEY (dept_type) REFERENCES department_type (dept_id) ON DELETE SET NULL,
-    CONSTRAINT manager_fk_company_id FOREIGN KEY (company_id) REFERENCES company (company_id) ON DELETE SET NULL
+    CONSTRAINT manager_fk_company_id FOREIGN KEY (company_id) REFERENCES company (company_id) ON DELETE CASCADE
 );
 
 CREATE TABLE employee (
@@ -68,7 +68,7 @@ CREATE TABLE employee (
     CONSTRAINT employee_salary_check check (salary > -1),
     CONSTRAINT employee_fk_manager_id FOREIGN KEY (manager_id) REFERENCES manager (manager_id) ON DELETE SET NULL,
     CONSTRAINT employee_fk_dept_type FOREIGN KEY (dept_type) REFERENCES department_type (dept_id) ON DELETE SET NULL,
-    CONSTRAINT employee_fk_company_id FOREIGN KEY (company_id) REFERENCES company (company_id) ON DELETE SET NULL
+    CONSTRAINT employee_fk_company_id FOREIGN KEY (company_id) REFERENCES company (company_id) ON DELETE CASCADE
 );
 
 CREATE TABLE salary_audit (
