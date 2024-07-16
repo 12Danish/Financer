@@ -222,4 +222,129 @@ BEGIN
     END LOOP;
 END$$
 
+-- This procedure takes in the the company_id and then adds all employees related to company to hiring_audit
+CREATE PROCEDURE employees_of_company_into_hiring_audit_after_company_deletion(IN input_company_id INT)
+BEGIN
+    DECLARE done INT DEFAULT 0;
+    DECLARE company_emp_id INT;
+    DECLARE company_emp_manager_id INT;
+    DECLARE company_emp_title VARCHAR(70);
+    DECLARE company_emp_dept_type INT;
+    DECLARE company_emp_cursor CURSOR FOR 
+        SELECT emp_id, manager_id, title, dept_type
+        FROM employee 
+        WHERE employee.company_id = input_company_id;
+    
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+	
+    -- Open cursor
+    OPEN company_emp_cursor;
+	
+    -- Fetch data from cursor
+    fetch_loop: LOOP
+        FETCH company_emp_cursor INTO company_emp_id, company_emp_manager_id, company_emp_title, company_emp_dept_type;
+        IF done THEN
+            LEAVE fetch_loop;
+        END IF;
+         
+        -- Call the procedure for each employee
+        CALL insert_into_hiring_audit(company_emp_id, company_emp_manager_id, company_emp_title, company_emp_dept_type, input_company_id, 'inactive', 'employee');
+    END LOOP;
+END$$
+
+
+-- This procedure takes in the the company_id and then inserts all relevant managers into hiring audit
+CREATE PROCEDURE managers_of_company_into_hiring_audit_after_company_deletion(IN input_company_id INT)
+BEGIN
+    DECLARE done INT DEFAULT 0;
+    DECLARE company_manager_id INT;
+    DECLARE company_manager_title VARCHAR(70);
+    DECLARE company_manager_dept_type INT;
+    DECLARE company_manager_managed_by INT;
+
+    DECLARE company_manager_cursor CURSOR FOR 
+        SELECT manager_id, title, dept_type
+        FROM manager
+        WHERE manager.company_id = input_company_id;
+    
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+	
+    SET company_manager_managed_by = check_has_manager_post_manager_deletion_or_insertion(input_manager_id);
+    -- Open cursor
+    OPEN company_manager_cursor;
+	
+    -- Fetch data from cursor
+    fetch_loop: LOOP
+        FETCH company_manager_cursor INTO company_manager_id, company_manager_title, company_manager_dept_type;
+        IF done THEN
+            LEAVE fetch_loop;
+        END IF;
+         
+        -- Call the procedure for each employee
+        CALL insert_into_hiring_audit(company_manager_id, company_manager_managed_by, company_manager_title, company_manager_dept_type, input_company_id, 'inactive', 'manager');
+    END LOOP;
+END$$
+
+-- This procedure takes in the the company_id and then adds all employees related to company to hiring_audit
+CREATE PROCEDURE employees_of_dept_into_hiring_audit_after_dept_deletion(IN input_department_type INT, IN input_company_id INT)
+BEGIN
+    DECLARE done INT DEFAULT 0;
+    DECLARE department_emp_id INT;
+    DECLARE department_emp_manager_id INT;
+    DECLARE department_emp_title VARCHAR(70);
+    
+    DECLARE department_emp_cursor CURSOR FOR 
+        SELECT emp_id, manager_id, title 
+        FROM employee 
+        WHERE employee.dept_type = input_department_type AND employee.company_id = input_company_id ;
+    
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+	
+    -- Open cursor
+    OPEN department_emp_cursor;
+	
+    -- Fetch data from cursor
+    fetch_loop: LOOP
+        FETCH department_emp_cursor INTO department_emp_id, department_emp_manager_id, department_emp_title;
+        IF done THEN
+            LEAVE fetch_loop;
+        END IF;
+         
+        -- Call the procedure for each employee
+        CALL insert_into_hiring_audit(department_emp_id, department_emp_manager_id, department_emp_title,input_dept_type,input_company_id, 'inactive', 'employee');
+    END LOOP;
+END$$
+
+
+-- This procedure takes in the the company_id and then inserts all relevant managers into hiring audit
+CREATE PROCEDURE managers_of_dept_into_hiring_audit_after_dept_deletion(IN input_company_id INT, IN input_dept_type INT )
+BEGIN
+    DECLARE done INT DEFAULT 0;
+    DECLARE department_manager_id INT;
+    DECLARE department_manager_title VARCHAR(70);
+    DECLARE department_manager_managed_by INT;
+    DECLARE department_manager_cursor CURSOR FOR 
+        SELECT manager_id, title, dept_type
+        FROM manager
+        WHERE manager.company_id = input_company_id and manager.dept_type = input_dept_type;
+    
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+	
+    SET department_manager_managed_by = check_has_manager_post_manager_deletion_or_insertion(input_manager_id);
+    -- Open cursor
+    OPEN department_manager_cursor;
+	
+    -- Fetch data from cursor
+    fetch_loop: LOOP
+        FETCH department_manager_cursor INTO department_manager_id, department_manager_title;
+        IF done THEN
+            LEAVE fetch_loop;
+        END IF;
+         
+        -- Call the procedure for each employee
+        CALL insert_into_hiring_audit(department_manager_id, department_manager_managed_by, department_manager_title, input_dept_type, input_company_id, 'inactive', 'manager');
+    END LOOP;
+END$$
+
+
 DELIMITER ;
