@@ -349,4 +349,13 @@ CALL employees_of_company_into_hiring_audit_after_company_deletion(OLD.company_i
 CALL managers_of_company_into_hiring_audit_after_company_deletion(OLD.company_id);
 END$$
 
+
+CREATE TRIGGER before_dept_delete_handle_employees_and_managers
+BEFORE DELETE ON department 
+FOR EACH ROW 
+BEGIN
+CALL employees_of_dept_into_hiring_audit_after_dept_deletion( OLD.dept_type,OLD.company_id); 
+CALL managers_of_dept_into_hiring_audit_after_dept_deletion(OLD.company_id, OLD.dept_type);
+END$$
+
 DELIMITER ;
