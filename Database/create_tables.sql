@@ -42,7 +42,7 @@ CREATE TABLE department (
     CONSTRAINT dept_comp_pk PRIMARY KEY (dept_type, company_id),
     CONSTRAINT department_fk_dept_type FOREIGN KEY (dept_type) REFERENCES department_type (dept_id) ON DELETE CASCADE,
     CONSTRAINT department_fk_company_id FOREIGN KEY (company_id) REFERENCES company (company_id) ON DELETE CASCADE
-);
+            );
 
 CREATE TABLE manager (
     manager_id INT,

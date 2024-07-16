@@ -339,6 +339,14 @@ FOR EACH ROW
 BEGIN 
 CALL insert_into_department_audit(OLD.dept_type,OLD.company_id, 'inactive');
 END$$
-DELIMITER ;
+
+-- Trigger for moving employees and managers into hiring audit once department/company is deleted
+CREATE TRIGGER before_company_delete_handle_employees_and_managers
+BEFORE DELETE ON company
+FOR EACH ROW 
+BEGIN 
+CALL employees_of_company_into_hiring_audit_after_company_deletion(OLD.company_id);
+CALL managers_of_company_into_hiring_audit_after_company_deletion(OLD.company_id);
+END$$
 
 DELIMITER ;
