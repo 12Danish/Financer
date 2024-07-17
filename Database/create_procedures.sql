@@ -286,7 +286,7 @@ BEGIN
 END$$
 
 -- This procedure takes in the the company_id and then adds all employees related to company to hiring_audit
-CREATE PROCEDURE employees_of_dept_into_hiring_audit_after_dept_deletion(IN input_department_type INT, IN input_company_id INT)
+CREATE PROCEDURE employees_of_dept_into_hiring_audit_after_dept_deletion(IN input_dept_type INT, IN input_company_id INT)
 BEGIN
     DECLARE done INT DEFAULT 0;
     DECLARE department_emp_id INT;
@@ -296,7 +296,7 @@ BEGIN
     DECLARE department_emp_cursor CURSOR FOR 
         SELECT emp_id, manager_id, title 
         FROM employee 
-        WHERE employee.dept_type = input_department_type AND employee.company_id = input_company_id ;
+        WHERE employee.dept_type = input_dept_type AND employee.company_id = input_company_id ;
     
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
 	
