@@ -97,9 +97,7 @@ CREATE TABLE hiring_audit (
     status ENUM ('active', 'inactive'),
     CONSTRAINT hiring_audit_pk PRIMARY KEY (audit_id),
     CONSTRAINT hiring_audit_fk_staff_id FOREIGN KEY (staff_id) REFERENCES user (reg_id) ON DELETE set null,
-    CONSTRAINT hiring_audit_fk_managed_by FOREIGN KEY(managed_by) REFERENCES user(reg_id) ON DELETE set null,
-    CONSTRAINT hiring_audit_fk_dept_type FOREIGN KEY (dept_type) REFERENCES department_type (dept_id) ON DELETE SET NULL,
-    CONSTRAINT hiring_audit_fk_company_id FOREIGN KEY (company_id) REFERENCES company (company_id) ON DELETE SET NULL
+    CONSTRAINT hiring_audit_fk_managed_by FOREIGN KEY(managed_by) REFERENCES user(reg_id) ON DELETE set null
 );
 
 CREATE TABLE account (

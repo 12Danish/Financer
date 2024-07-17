@@ -324,13 +324,12 @@ BEGIN
     DECLARE department_manager_title VARCHAR(70);
     DECLARE department_manager_managed_by INT;
     DECLARE department_manager_cursor CURSOR FOR 
-        SELECT manager_id, title, dept_type
+        SELECT manager_id, title
         FROM manager
         WHERE manager.company_id = input_company_id and manager.dept_type = input_dept_type;
     
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
 	
-    SET department_manager_managed_by = check_has_manager_post_manager_deletion_or_insertion(input_manager_id);
     -- Open cursor
     OPEN department_manager_cursor;
 	
@@ -340,7 +339,7 @@ BEGIN
         IF done THEN
             LEAVE fetch_loop;
         END IF;
-         
+         SET department_manager_managed_by = check_has_manager_post_manager_deletion_or_insertion(department_manager_id);
         -- Call the procedure for each employee
         CALL insert_into_hiring_audit(department_manager_id, department_manager_managed_by, department_manager_title, input_dept_type, input_company_id, 'inactive', 'manager');
     END LOOP;
